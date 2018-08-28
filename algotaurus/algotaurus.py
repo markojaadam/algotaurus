@@ -18,6 +18,8 @@ import os
 import appdirs
 import ConfigParser
 import gettext
+from arabic_reshaper import reshape as a_reshape
+from bidi.algorithm import get_display as display_bidi
 
 __version__  = '1.1.1'
 copyright_years = '2015-2018'
@@ -33,10 +35,13 @@ if not os.path.isfile(dirs.user_config_dir+'/algotaurus.ini'):
 config = ConfigParser.RawConfigParser()
 config.read(dirs.user_config_dir+'/algotaurus.ini')
 language = config.get('settings', 'language')
+rtl_language = language in ['fa']
 
 # Set language for localization
 t = gettext.translation('algotaurus', at_dir+'/locale/', [language], fallback=True)
-_ = t.ugettext
+
+def _(text):
+    return display_bidi(a_reshape(t.ugettext(text))) if rtl_language else t.ugettext(text)
 # Only the GUI is localized now, not the TUI
 [_('left'), _('right'), _('step'), _('wall?'), _('exit?'), _('quit'), _('goto')]  # for the generate_pot script
 local_commands = [_(command) for command in ['left', 'right', 'step', 'wall?', 'exit?', 'quit', 'goto']]
@@ -482,6 +487,7 @@ class AlgoTaurusGui:
 
         # Create menu for the GUI
         languages = {'Hungarian': 'hu', 'English': 'en', 'Persian': 'fa'}  # do not localize this, because it could be hard for the ...
+        text_just = 'right' if rtl_language else 'left'
         # user to switch back after switching accidently to an unknown language
         help_url = 'https://github.com/AlgoTaurus/algotaurus/'
         self.lang_value = tk.StringVar()
@@ -575,7 +581,7 @@ class AlgoTaurusGui:
         samplab = Labyrinth(x=self.x, y=self.y, labyr_type=self.labyr_type.get())
         Robot(samplab)
         self.draw_labyr(samplab.labyr)
-        self.instr = ttk.Label(self.mainframe, text=command_help, justify='left', padding=10)
+        self.instr = ttk.Label(self.mainframe, text=command_help, justify=text_just, padding=10)
         # Creating buttons
         self.buttstop = ttk.Button(self.controlframe, text=_('Stop code\nexecution (F7)'), command=self.stopcommand, state='disabled')
         self.buttstep = ttk.Button(self.controlframe, text=_('Try the code\nLine by line (F6)'), command=self.stepmode)
@@ -587,10 +593,10 @@ class AlgoTaurusGui:
 
         # Widgets in mainframe
         self.codertitle.grid(column=1, row=0, columnspan=2, pady=10)
-        self.instr.grid(column=0, row=1, sticky='n')
-        self.linebox.grid(column=1, row=1, sticky='en')
-        self.textPad.grid(column=2, row=1, sticky='wn')
-        self.canvas.grid(column=3, row=1, sticky='ws', padx=20)
+        self.instr.grid(column=3 if rtl_language else 0, row=1, sticky='n')
+        self.linebox.grid(column=2 if rtl_language else 1, row=1, sticky='wn' if rtl_language else 'en')
+        self.textPad.grid(column=1 if rtl_language else 2, row=1, sticky='en' if rtl_language else 'wn')
+        self.canvas.grid(column=0 if rtl_language else 3, row=1, sticky='es' if rtl_language else 'ws', padx=20)
 
         # Widgets in buttonframe
 
@@ -599,7 +605,7 @@ class AlgoTaurusGui:
         self.buttrun.grid(row=0, column=0, columnspan=2, padx=10)
         self.buttstep.grid(row=0, column=2, padx=10)
         self.buttstop.grid(row=0, column=3, padx=10)
-        self.controlframe.grid(column=0, row=2, columnspan=3, padx=10, pady=10)
+        self.controlframe.grid(column=3 if rtl_language else 0, row=2, columnspan=3, padx=10, pady=10)
         # Center the window and set the minimal size
         self.root.update()
         w, h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
