@@ -575,7 +575,16 @@ class AlgoTaurusGui:
         self.linebox.configure(bg='grey', fg='black', state='disabled', relief='flat')
         self.codertitle = ttk.Label(self.mainframe, text=_('Coder'), justify='center')
         self.textPad.bind('<Button-3>', self.rclick)
-        self.textPad.bind('<Key>', self.validate_input)        
+        self.textPad.bind('<Key>', self.validate_input)
+        if rtl_language:
+            self.rtlCursorPos = 0
+            self.rtlReleseEvent = False
+            self.rtlCombination = False
+            self.rtlCombKeys = []
+            self.textPad.tag_configure('tag-right', justify='right')
+            self.textPad.bind("<KeyRelease>", self.rtlRelease)
+            self.textPad.bind("<KeyPress>", self.rtlPress)
+            self.textPad.bind("<ButtonRelease>", self.rtlMouse)
         # Creating canvas and drawing sample labyrinth
         self.canvas = tk.Canvas(self.mainframe, width=self.size*(self.x+4), height=self.size*(self.y+4))
         samplab = Labyrinth(x=self.x, y=self.y, labyr_type=self.labyr_type.get())
@@ -644,6 +653,48 @@ class AlgoTaurusGui:
         if lines > self.lines+2:
             endline = str(self.lines+1)+'.0'
             self.textPad.delete(endline, 'end')
+
+    def rtlRelease(self, event):
+        self.rtlReleseEvent = True
+        t = self.textPad.get('1.0', 'end' + '-1c')
+        line, pos = self.textPad.index('insert').split('.')
+        length = t.split('\n')[int(line) - 1] if '\n' in t else len(t)
+        if event.keycode not in [110, 113, 114, 115, 37] and not self.rtlCombination:
+            self.rtlCursorPos = self.textPad.index('insert')
+            self.textPad.delete('1.0','end')
+            self.textPad.insert('end',display_bidi(a_reshape(t)),'tag-right')
+        elif self.rtlCombination:
+            self.rtlCombination = False
+        self.rtlCombKeys = []
+        self.textPad.mark_set('insert',self.rtlCursorPos)
+
+    def rtlPress(self,event):
+        self.rtlReleseEvent = False
+        t = self.textPad.get('1.0', 'end' + '-1c')
+        line, pos = self.textPad.index('insert').split('.')
+        length = len(t.split('\n')[int(line)-1]) if '\n' in t else len(t)
+        if event.keycode == 113 and pos != str(length): #LEFT
+            self.rtlCursorPos = line + '.' + str(int(self.rtlCursorPos.split('.')[1]) + 1)
+        elif event.keycode == 114 and pos != '0': #RIGHT
+            self.rtlCursorPos = line + '.' + str(int(self.rtlCursorPos.split('.')[1]) - 1)
+        elif event.keycode == 110: #HOME
+            self.rtlCursorPos = line + '.' + str(length)
+        elif event.keycode == 115: #END
+            self.rtlCursorPos = line + '.0'
+        elif event.keycode == 36: #RETURN
+            if pos == str(length):
+                self.rtlCursorPos = self.rtlCursorPos.split('.')[0] + '.0'
+            elif pos == '0':
+                self.rtlCursorPos = self.rtlCursorPos.split('.')[0] + '.' + str(length)
+            self.textPad.mark_set('insert',self.rtlCursorPos)
+        if not self.rtlReleseEvent:
+            self.rtlCombKeys.append(event.keycode)
+            print self.rtlCombKeys
+            if sum([e in self.rtlCombKeys for e in [37, 64, 50, 105, 108]]):
+                self.rtlCombination = True
+
+    def rtlMouse(self,event):
+        self.rtlCursorPos = self.textPad.index('insert')
 
     def new_command(self, event=None):
         if self.textPad.get('1.0', 'end'+'-1c') != '':
