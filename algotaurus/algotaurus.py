@@ -689,7 +689,6 @@ class AlgoTaurusGui:
             self.textPad.mark_set('insert',self.rtlCursorPos)
         if not self.rtlReleseEvent:
             self.rtlCombKeys.append(event.keycode)
-            print self.rtlCombKeys
             if sum([e in self.rtlCombKeys for e in [37, 64, 50, 105, 108]]):
                 self.rtlCombination = True
 

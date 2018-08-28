@@ -18,7 +18,7 @@ setup(name='algotaurus',
       packages=['algotaurus'],	  
       package_dir={'algotaurus':'algotaurus'},
       include_package_data=True,
-      install_requires=['numpy'],
+      install_requires=['numpy','arabic_reshaper','python-bidi'],
 	  classifiers=[
 			# "Development Status :: 1 - Planning",
 			# "Development Status :: 2 - Pre-Alpha",
