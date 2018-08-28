@@ -40,11 +40,11 @@ Some tasks to solve and discuss:
 - Try to make the code to move as little as possible.
 - Try to minimize the number of lines needed to be executed.
 
-## Localization
-
-If you want to use AlgoTaurus in other languages, you can help translating it on [POEditor](https://poeditor.com/projects/view?id=91267). 
-
 ## Changelog
+
+Upcoming version
+- Persian version (thanks to Seyed Amir Hossein Yousefi)
+- AlgoTaurus can be installed as Python package
 
 Version 1.1.1
 - Add menu shortcuts
@@ -62,10 +62,16 @@ Version 1.1
 Version 1.0
 - Initial release
 
+## Localization
+
+If you want to use AlgoTaurus in other languages, you can help translating it on [POEditor](https://poeditor.com/projects/view?id=91267).
+
+Localizers: Attila Krajcsi (Hungarian), Seyed Amir Hossein Yousefi (Persian)
+
 ## Copyright
 
 The game is a remake and an extension of the game Labirint by Lukyanov Konstantin and Volkov Sergey.
 
-Copyright, 2015-2017, Attila Krajcsi, Ádám Markója (GUI)
+Copyright, 2015-2018, Attila Krajcsi, Ádám Markója (GUI)
 
 AlgoTaurus is distributed under the terms of the GNU General Public License 3.

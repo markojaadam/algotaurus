@@ -5,7 +5,7 @@ AlgoTaurus
 An educational game to teach programming.
 Write a program to make the AlgoTaurus find the exit.
 
-Copyright, 2015-2017, Attila Krajcsi, Ádám Markója (GUI)
+Copyright, 2015-2018, Attila Krajcsi, Ádám Markója (GUI)
 
 AlgoTaurus is distributed under the terms of the GNU General Public License 3.
 """
@@ -18,6 +18,9 @@ import os
 import appdirs
 import ConfigParser
 import gettext
+
+__version__  = '1.1.1'
+copyright_years = '2015-2018'
 
 # Read config file
 dirs = appdirs.AppDirs('algotaurus')
@@ -478,7 +481,7 @@ class AlgoTaurusGui:
                         _('''GOTO m\t Continue with line m''')])
 
         # Create menu for the GUI
-        languages = {'Hungarian': 'hu', 'English': 'en'}  # do not localize this, because it could be hard for the ...
+        languages = {'Hungarian': 'hu', 'English': 'en', 'Persian': 'fa'}  # do not localize this, because it could be hard for the ...
         # user to switch back after switching accidently to an unknown language
         help_url = 'https://github.com/AlgoTaurus/algotaurus/'
         self.lang_value = tk.StringVar()
@@ -627,6 +630,7 @@ class AlgoTaurusGui:
             cfgfile = open(dirs.user_config_dir + '/algotaurus.ini', 'w')
             config.set('settings', 'language', self.lang_value.get())
             config.write(cfgfile)
+            cfgfile.close()  # close the file, otherwise if the application is closed here, the ini file will be empty
             self.tkMessageBox.showinfo(title=_('Info'), message=_('Changes will be applied on the next startup'))
 
     def validate_input(self, event):
@@ -666,7 +670,7 @@ class AlgoTaurusGui:
             self.root.destroy()
 
     def about_command(self, event=None):
-        self.tkMessageBox.showinfo(_('About'), _(u'AlgoTaurus 1.1.1\nCopyright © 2015-2017 Attila Krajcsi and Ádám Markója'))
+        self.tkMessageBox.showinfo(_('About'), _(u'AlgoTaurus %s\nCopyright © %s Attila Krajcsi and Ádám Markója') % (__version__, copyright_years))
 
     def sel_all(self, event=None):
         self.textPad.tag_add('sel', '1.0', 'end')
